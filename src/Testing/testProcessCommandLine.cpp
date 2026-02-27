@@ -151,3 +151,31 @@ TEST(CommandLine, CipherTypeVigenere)
     EXPECT_EQ(settings.cipherType.size(), 1);
     EXPECT_EQ(settings.cipherType[0], CipherType::Vigenere);
 }
+
+TEST(CommandLine, MultiCipherValidInput)
+{
+    ProgramSettings settings;
+    const std::vector<std::string> cmdLine{
+        "mpags-cipher",
+        "--multi-cipher", "2",
+        "-c", "caesar",
+        "-k", "3",
+        "-c", "vigenere",
+        "-k", "SECRET",
+        "--encrypt"
+    };
+    const bool res{processCommandLine(cmdLine, settings)};
+
+    EXPECT_TRUE(res);
+    EXPECT_EQ(settings.nExpectedCiphers, 2);
+    EXPECT_EQ(settings.cipherType.size(), 2);
+    EXPECT_EQ(settings.cipherKey.size(), 2);
+
+    EXPECT_EQ(settings.cipherType[0], CipherType::Caesar);
+    EXPECT_EQ(settings.cipherType[1], CipherType::Vigenere);
+
+    EXPECT_EQ(settings.cipherKey[0], "3");
+    EXPECT_EQ(settings.cipherKey[1], "SECRET");
+
+    EXPECT_EQ(settings.cipherMode, CipherMode::Encrypt);
+}

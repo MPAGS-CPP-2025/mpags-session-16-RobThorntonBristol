@@ -16,9 +16,9 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
     bool processStatus{true};
 
     // Default to expecting information about one cipher
-    const std::size_t nExpectedCiphers{1};
-    settings.cipherType.reserve(nExpectedCiphers);
-    settings.cipherKey.reserve(nExpectedCiphers);
+    // const std::size_t nExpectedCiphers{1};
+    settings.cipherType.reserve(settings.nExpectedCiphers);
+    settings.cipherKey.reserve(settings.nExpectedCiphers);
 
     // Process the arguments - ignore zeroth element, as we know this to be
     // the program name and don't need to worry about it
@@ -103,6 +103,9 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
                 }
                 ++i;
             }
+        } else if (cmdLineArgs[i] == "--multi-cipher") {
+            settings.nExpectedCiphers = std::stoul(cmdLineArgs[i+1]);
+            ++i;
         } else {
             // Have encoutered an unknown flag, output an error message,
             // set the flag to indicate the error and terminate the loop
@@ -115,7 +118,7 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
 
     // For backward compatibility we allow (for a single cipher) nothing to be
     // specified and default to using Caesar cipher and/or an empty string key
-    if (nExpectedCiphers == 1) {
+    if (settings.nExpectedCiphers == 1) {
         if (settings.cipherType.empty()) {
             settings.cipherType.push_back(CipherType::Caesar);
         }
@@ -127,8 +130,8 @@ bool processCommandLine(const std::vector<std::string>& cmdLineArgs,
     // Check that we have information on the expected number of ciphers
     const std::size_t nTypes{settings.cipherType.size()};
     const std::size_t nKeys{settings.cipherKey.size()};
-    if (nTypes != nExpectedCiphers || nKeys != nExpectedCiphers) {
-        std::cerr << "[error] expected types and keys for " << nExpectedCiphers
+    if (nTypes != settings.nExpectedCiphers || nKeys != settings.nExpectedCiphers) {
+        std::cerr << "[error] expected types and keys for " << settings.nExpectedCiphers
                   << " ciphers\n"
                   << "        but received " << nTypes << " types and " << nKeys
                   << " keys" << std::endl;
